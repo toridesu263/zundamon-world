@@ -1,26 +1,35 @@
-use std::fs;
+use std::fs::File;
+use std::io::BufReader;
+use rodio::{Decoder, OutputStream, Sink};
 
 fn main() {
-    let entries = fs::read_dir("tts_queue_Rust");
-    match entries {
-        Ok(paths) => {
-            let mut files: Vec<_> = paths
-            .filter_map(|e| {
-                let path = e.unwrap().path();
-                if path.extension().and_then(|e| e.to_str()) == Some("wav") {
-                    Some(path)
-                } else {
-                    None
-                }
-            })
-            .collect();
+    let (_stream, stream_handle) = OutputStream::try_default().unwrap();
+    let sink = Sink::try_new(&stream_handle).unwrap();
 
-            files.sort();
+    let file = File::open("tts_queue_Rust/test.wav").unwrap();
+    let source = Decoder::new(BufReader::new(file)).unwrap();
 
-            for f in &files {
-                println!("{:?}", f);
-            }
-        }
-        Err(e) => println!("エラー: {}", e),
-    }
+    sink.append(source);
+    sink.sleep_until_end();
+
+    println!("再生完了！");
 }
+
+/*
+use std::fs::File;
+use std::io::BufReader;
+use rodio::{Decoder, OutputStream, Sink};
+
+fn main() {
+    let (_stream, stream_handle) = OutputStream::try_default().unwrap();
+    let sink = Sink::try_new(&stream_handle).unwrap();
+
+    let file = File::open("tts_queue_Rust/こんにちは.wav").unwrap();
+    let source = Decoder::new(BufReader::new(file)).unwrap();
+
+    sink.append(source);
+    sink.sleep_until_end();
+
+    println!("再生完了");
+}
+*/
