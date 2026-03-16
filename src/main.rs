@@ -40,7 +40,7 @@ fn main() {
     let sink = Sink::try_new(&stream_handle).unwrap();
 
     loop {
-        let mut files: Vec<_> = fs::read_dir("tts_queue_Rust")
+        let mut files: Vec<_> = fs::read_dir(r"C:\Users\とりです\Desktop\aboutStreamerbot\tts_queue_player\tts_queue_Rust")
         .unwrap()
         .filter_map(|e| {
             let path = e.unwrap().path();
