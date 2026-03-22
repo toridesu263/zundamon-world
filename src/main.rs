@@ -89,7 +89,7 @@ fn main() {
         .unwrap()
         .find(|d| {
             d.name()
-                .map(|n| n.containes("CABLE Input"))
+                .map(|n| n.contains("CABLE Input"))
                 .unwrap_or(false)
         })
         .expect("VB-Cableが見つかりません");
