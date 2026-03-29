@@ -67,11 +67,11 @@ config.tomlの中身の「とりです」の部分を自分のユーザー名に
 
 ## 使用手順
 
-1.OBSを起動(必須)
-2.streamerbot起動(必須)
-3.VOICEVOXを起動(必須)
-4.zundamon-worldの中のtts_queue_player.exeをダブルクリック
-5.zundamon-worldの中のtts_copy.exeをダブルクリック
+1. OBSを起動(必須)
+2. streamerbot起動(必須)
+3. VOICEVOXを起動(必須)
+4. zundamon-worldの中のtts_queue_player.exeをダブルクリック
+5. zundamon-worldの中のtts_copy.exeをダブルクリック
 これで起動は完了です
 
 以下、具体的な例です
