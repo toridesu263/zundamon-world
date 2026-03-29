@@ -1,1 +1,2 @@
-queue_dir = "C:\\Users\\とりです\\Desktop\\ずんだもんわーるど\\tts_queue_Rust"
+#ユーザー名を自分のものに変えてください
+queue_dir = "C:\\Users\\とりです\\Desktop\\zundamon-world\\tts_queue_Rust"

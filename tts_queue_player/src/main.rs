@@ -15,7 +15,7 @@ struct Config {
 }
 
 fn load_config() -> Config {
-    let text = fs::read_to_string("confit.toml")
+    let text = fs::read_to_string("config.toml")
         .expect("config.tomlが見つかりません");
     toml::from_str(&text).expect("config.tomlの形式が正しくありません")
 }
