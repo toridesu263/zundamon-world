@@ -1,1 +1,5 @@
 target/
+/config.toml
+/for_streamerbot.cs
+/tts_copy.exe
+/tts_queue_player.exe
