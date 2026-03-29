@@ -1,4 +1,5 @@
 use arboard::Clipboard;
+use serde::Deserialize;
 use std::fs;
 use std::path::Path;
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -8,10 +9,19 @@ use winit::event_loop::{ActiveEventLoop, ControlFlow, EventLoop};
 use winit::keyboard::{KeyCode, ModifiersState, PhysicalKey};
 use winit::window::{Window, WindowId};
 
-const QUEUE_DIR: &str = 
-    r"C:\Users\とりです\Desktop\ずんだもんわーるど\tts_queue_Rust";
 const SPEAKER_ZUNDAMON: u32 = 3;
 const SPEAKER_MEIMEIHIMARI: u32 = 14;
+
+#[derive(Deserialize)]
+struct Config {
+    queue_dir: String,
+}
+
+fn load_config() -> Config {
+    let text = fs::read_to_string("config.toml")
+        .expect("config.tomlが見つかりません");
+    toml::from_str(&text).expect("config.tomlの形式が正しくありません")
+}
 
 fn unix_time_ms() -> u128 {
     SystemTime::now()
@@ -24,7 +34,7 @@ fn log(msg: &str) {
     println!("[{}] {}", unix_time_ms(), msg);
 }
 
-fn save_to_queue(speaker_id: u32) {
+fn save_to_queue(speaker_id: u32, queue_dir: &str) {
     let mut clipboard = match Clipboard::new() {
         Ok(c) => c,
         Err(e) => {
@@ -57,7 +67,7 @@ fn save_to_queue(speaker_id: u32) {
             continue;
         }
         let filename = format!("claude_{}_{}_{}.txt", unix_time_ms(), i, speaker_id);
-        let filepath = Path::new(QUEUE_DIR).join(&filename);
+        let filepath = Path::new(queue_dir).join(&filename);
         match fs::write(&filepath, line) {
             Ok(_) => log(&format!("保存成功: {}", filename)),
             Err(e) => log(&format!("ファイル書き込み失敗: {:?}", e)),
@@ -69,14 +79,16 @@ struct App {
     window: Option<Window>,
     modifiers: ModifiersState,
     last_event: String,
+    queue_dir: String,
 }
 
 impl App {
-    fn new() -> Self {
+    fn new(queue_dir: String) -> Self {
         App {
             window: None,
             modifiers: ModifiersState::empty(),
             last_event: "待機中".to_string(),
+            queue_dir,
         }
     }
 
@@ -119,13 +131,13 @@ impl ApplicationHandler for App {
                             log("Ctrl+Shift+F9 検知 -> ずんだもん");
                             self.last_event = "Ctrl+Shift+F9 -> ずんだもん".to_string();
                             self.update_title();
-                            save_to_queue(SPEAKER_ZUNDAMON);
+                            save_to_queue(SPEAKER_ZUNDAMON, &self.queue_dir);
                         }
                         PhysicalKey::Code(KeyCode::F10) if ctrl && shift => {
                             log("Ctrl+Shift+F10 検知 -> めいめいひまり");
                             self.last_event = "Ctrl+Shift+F10 -> めいめいひまり".to_string();
                             self.update_title();
-                            save_to_queue(SPEAKER_MEIMEIHIMARI);
+                            save_to_queue(SPEAKER_MEIMEIHIMARI, &self.queue_dir);
                         }
                         _ => {}
                     }                    
@@ -137,7 +149,9 @@ impl ApplicationHandler for App {
 }
 
 fn main() {
-    if let Err(e) = fs::create_dir_all(QUEUE_DIR) {
+    let config = load_config();
+    let queue_dir = config.queue_dir;
+    if let Err(e) = fs::create_dir_all(&queue_dir) {
         eprintln!("キューフォルダ作成失敗: {:?}", e);
         return;
     }
@@ -149,5 +163,5 @@ fn main() {
 
     let event_loop = EventLoop::new().unwrap();
     event_loop.set_control_flow(ControlFlow::Wait);
-    event_loop.run_app(&mut App::new()).unwrap();
+    event_loop.run_app(&mut App::new(queue_dir)).unwrap();
 }
