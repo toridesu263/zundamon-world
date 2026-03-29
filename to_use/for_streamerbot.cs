@@ -14,8 +14,9 @@ public class CPHInline
 		// your main code goes here
 		CPH.TryGetArg("messageStripped", out string message);
         long unixtime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-        string path = "C:/Users/とりです/Desktop/ずんだもんわーるど/tts_queue_Rust";
-		string pathOfText = $"C:/Users/とりです/Desktop/ずんだもんわーるど/tts_queue_Rust/twitch_{unixtime}_10.txt";
+		//「とりです」の部分は自分のユーザー名に書き換えてください
+        string path = "C:/Users/とりです/Desktop/zundamon-world/tts_queue_Rust";
+		string pathOfText = $"C:/Users/とりです/Desktop/zundamon-world/tts_queue_Rust/twitch_{unixtime}_10.txt";
         File.WriteAllText(pathOfText, message);
 
 		return true;
