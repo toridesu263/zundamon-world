@@ -22,7 +22,7 @@ twitchの配信にvoicevoxの音声を乗せるためのツールです
 
 ## このリポジトリからダウンロードするもの 
 
-このページのからto_useに移動して以下をダウンロードしてください
+このページにあるto_useに移動して以下をダウンロードしてください
 1. tts_copy.exe
 2. tts_queue_player.exe
 3. for_streamerbot.cs
