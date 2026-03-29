@@ -2893,6 +2893,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d2df906b07856748fa3f6e0ad0cbaa047052d4a7dd609e231c4f72cee8c36f31"
 
 [[package]]
+name = "tts_copy"
+version = "0.1.0"
+dependencies = [
+ "arboard",
+ "serde",
+ "toml",
+ "winit",
+]
+
+[[package]]
 name = "tts_queue_player"
 version = "0.1.0"
 dependencies = [
@@ -3864,16 +3874,6 @@ name = "zmij"
 version = "1.0.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b8848ee67ecc8aedbaf3e4122217aff892639231befc6a1b58d29fff4c2cabaa"
-
-[[package]]
-name = "zundamon_world"
-version = "0.1.0"
-dependencies = [
- "arboard",
- "serde",
- "toml",
- "winit",
-]
 
 [[package]]
 name = "zune-core"
