@@ -1,0 +1,12 @@
+[package]
+name = "tts_queue_player"
+version = "0.1.0"
+edition = "2021"
+ 
+[dependencies]
+cpal = "0.15"
+rodio = "0.17"
+reqwest = { version = "0.12", features = ["blocking", "json"] }
+urlencoding = "2"
+serde = { version = "1", features = ["derive"] }
+toml = "0.8"
