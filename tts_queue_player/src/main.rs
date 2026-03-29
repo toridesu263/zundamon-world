@@ -5,9 +5,20 @@ use std::fs::File;
 use std::io::BufReader;
 use rodio::{Decoder, OutputStream, Sink};
 use cpal::traits::{DeviceTrait, HostTrait};
+use serde::Deserialize;
 
-const QUEUE_DIR: &str = r"C:\Users\とりです\Desktop\ずんだもんわーるど\tts_queue_Rust";
 const VOICEVOX_URL: &str = "http://localhost:50021";
+
+#[derive(Deserialize)]
+struct Config {
+    queue_dir: String,
+}
+
+fn load_config() -> Config {
+    let text = fs::read_to_string("confit.toml")
+        .expect("config.tomlが見つかりません");
+    toml::from_str(&text).expect("config.tomlの形式が正しくありません")
+}
 
 fn is_file_ready(path: &std::path::Path) -> bool {
     let mut prev_size: u64 = 0;
@@ -83,6 +94,9 @@ fn synthesize(text: &str, speaker_id: u32) -> Option<Vec<u8>> {
 }
 
 fn main() {
+    let config = load_config();
+    let queue_dir = config.queue_dir;
+
     let host = cpal::default_host();
     let device = host
         .output_devices()
@@ -97,10 +111,10 @@ fn main() {
     let (_stream, stream_handle) = OutputStream::try_from_device(&device).unwrap();
     let sink = Sink::try_new(&stream_handle).unwrap();
 
-    println!("監視開始: {}", QUEUE_DIR);
+    println!("監視開始: {}", queue_dir);
 
     loop {
-        let mut files: Vec<_> = fs::read_dir(QUEUE_DIR)
+        let mut files: Vec<_> = fs::read_dir(&queue_dir)
             .unwrap()
             .filter_map(|e| {
                 let path = e.unwrap().path();
