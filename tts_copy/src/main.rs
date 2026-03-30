@@ -107,7 +107,6 @@ impl ApplicationHandler for App {
                 Window::default_attributes()
                     .with_title("ずんだもんわーるど - 待機中")
                     .with_inner_size(winit::dpi::LogicalSize::new(400.0, 100.0))
-                    .with_resizable(false),
             )
             .unwrap();
         self.window = Some(window);
