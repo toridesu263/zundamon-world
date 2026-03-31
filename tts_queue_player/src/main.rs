@@ -155,36 +155,30 @@ fn main() {
 
             println!("合成中: {:?} (speaker_id: {})", f, speaker_id);
 
-            for line in text.lines() {
-                // VOICEVOX合成
-                let speed: f32 = match speaker_id {
-                    3 => 1.5,
-                    10 => 1.2,
-                    14 => 1.0,
-                    _ => 1.0,
-                };
-                let wav = match synthesize(line, speaker_id, speed) {
-                    Some(w) => w,
-                    None => {
-                        eprintln!("合成失敗、スキップ: {:?}", f);
-                        
-                        continue;
-                    }
-                };
-
-                // 一時wavファイルに書き出して再生
-                let wav_path = f.with_extension("wav");
-                fs::write(&wav_path, &wav).unwrap();
-
-                let file = File::open(&wav_path).unwrap();
-                let source = Decoder::new(BufReader::new(file)).unwrap();
-                sink.append(source);
-                sink.sleep_until_end();
-
-                //後片付け
-                fs::remove_file(&wav_path).unwrap();
-            }
-            
+            // VOICEVOX合成
+            let speed: f32 = match speaker_id {
+                3 => 1.5,
+                10 => 1.2,
+                14 => 1.0,
+                _ => 1.0,
+            };
+            let wav = match synthesize(&text, speaker_id, speed) {
+                Some(w) => w,
+                None => {
+                    eprintln!("合成失敗、スキップ: {:?}", f);
+                    
+                    continue;
+                }
+            };
+            // 一時wavファイルに書き出して再生
+            let wav_path = f.with_extension("wav");
+            fs::write(&wav_path, &wav).unwrap();
+            let file = File::open(&wav_path).unwrap();
+            let source = Decoder::new(BufReader::new(file)).unwrap();
+            sink.append(source);
+            sink.sleep_until_end();
+            //後片付け
+            fs::remove_file(&wav_path).unwrap();
             fs::remove_file(f).unwrap();
             println!("再生完了: {:?}", f);
         }
