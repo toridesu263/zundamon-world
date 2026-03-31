@@ -46,7 +46,7 @@ fn parse_speaker_id(path: &std::path::Path) -> Option<u32> {
     parts.last()?.parse().ok()
 }
 
-fn synthesize(text: &str, speaker_id: u32) -> Option<Vec<u8>> {
+fn synthesize(text: &str, speaker_id: u32, speed: f32) -> Option<Vec<u8>> {
     let client = reqwest::blocking::Client::new();
 
     // audio_queryでクエリ作成
@@ -70,11 +70,15 @@ fn synthesize(text: &str, speaker_id: u32) -> Option<Vec<u8>> {
     };
     
     // synthesisでwav合成
+    let mut query_json: serde_json::Value = serde_json::from_str(&query).ok()?;
+    query_json["speedScale"] = serde_json::json!(speed);
+    let modified_query = serde_json::to_string(&query_json).ok()?;
+
     let synthesis_url = format!("{}/synthesis?speaker={}", VOICEVOX_URL, speaker_id);
     let wav = match client
         .post(&synthesis_url)
         .header("Content-Type", "application/json")
-        .body(query)
+        .body(modified_query)
         .send()
     {
         Ok(r) => match r.bytes() {
@@ -110,9 +114,9 @@ fn main() {
 
     let (_stream, stream_handle) = OutputStream::try_from_device(&device).unwrap();
     let sink = Sink::try_new(&stream_handle).unwrap();
-
+    
     println!("監視開始: {}", queue_dir);
-
+    
     loop {
         let mut files: Vec<_> = fs::read_dir(&queue_dir)
             .unwrap()
@@ -140,6 +144,7 @@ fn main() {
             };
 
             // テキスト読み込み
+            //ここちゃんと修正すること
             let text = match fs::read_to_string(f) {
                 Ok(t) => t,
                 Err(e) => {
@@ -150,27 +155,36 @@ fn main() {
 
             println!("合成中: {:?} (speaker_id: {})", f, speaker_id);
 
-            // VOICEVOX合成
-            let wav = match synthesize(&text, speaker_id) {
-                Some(w) => w,
-                None => {
-                    eprintln!("合成失敗、スキップ: {:?}", f);
-                    fs::remove_file(f).unwrap();
-                    continue;
-                }
-            };
+            for line in text.lines() {
+                // VOICEVOX合成
+                let speed: f32 = match speaker_id {
+                    3 => 1.5,
+                    10 => 1.2,
+                    14 => 1.0,
+                    _ => 1.0,
+                };
+                let wav = match synthesize(line, speaker_id, speed) {
+                    Some(w) => w,
+                    None => {
+                        eprintln!("合成失敗、スキップ: {:?}", f);
+                        
+                        continue;
+                    }
+                };
 
-            // 一時wavファイルに書き出して再生
-            let wav_path = f.with_extension("wav");
-            fs::write(&wav_path, &wav).unwrap();
+                // 一時wavファイルに書き出して再生
+                let wav_path = f.with_extension("wav");
+                fs::write(&wav_path, &wav).unwrap();
 
-            let file = File::open(&wav_path).unwrap();
-            let source = Decoder::new(BufReader::new(file)).unwrap();
-            sink.append(source);
-            sink.sleep_until_end();
+                let file = File::open(&wav_path).unwrap();
+                let source = Decoder::new(BufReader::new(file)).unwrap();
+                sink.append(source);
+                sink.sleep_until_end();
 
-            //後片付け
-            fs::remove_file(&wav_path).unwrap();
+                //後片付け
+                fs::remove_file(&wav_path).unwrap();
+            }
+            
             fs::remove_file(f).unwrap();
             println!("再生完了: {:?}", f);
         }
