@@ -114,6 +114,10 @@ impl ApplicationHandler for App {
 
     fn window_event(&mut self, event_loop: &ActiveEventLoop, _id: WindowId, event: WindowEvent) {
         match event {
+            WindowEvent::ScaleFactorChanged { scale_factor, inner_size_writer: _ } => {
+                log(&format!("DPIスケール変更: {:.2}", scale_factor));
+                //何もしない                
+            }
             WindowEvent::CloseRequested => {
                 event_loop.exit();
             }
