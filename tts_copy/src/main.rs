@@ -117,9 +117,8 @@ impl ApplicationHandler for App {
 
     fn window_event(&mut self, event_loop: &ActiveEventLoop, _id: WindowId, event: WindowEvent) {
         match event {
-            WindowEvent::ScaleFactorChanged { inner_size_writer: mut writer, ..  } => {
+            WindowEvent::ScaleFactorChanged { inner_size_writer: mut writer, .. } => {
                 let _ = writer.request_inner_size(winit::dpi::PhysicalSize::new(400, 100));
-                //何もしない                
             }
             WindowEvent::CloseRequested => {
                 event_loop.exit();
