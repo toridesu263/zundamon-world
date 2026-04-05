@@ -102,6 +102,9 @@ impl App {
 
 impl ApplicationHandler for App {
     fn resumed(&mut self, event_loop: &ActiveEventLoop) {
+        if self.window.is_some() {
+            return;
+        }
         let window = event_loop
             .create_window(
                 Window::default_attributes()
